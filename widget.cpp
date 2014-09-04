@@ -1,7 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include <QtGui>
-#include <QtSql>
 
 Widget::Widget(QWidget *parent) :
   QWidget(parent),
@@ -23,23 +22,43 @@ Widget::Widget(QWidget *parent) :
   if (!db.open()) {
     qDebug() << "Cannot open database:" << db.lastError();
   }
-  QSqlTableModel *model = new QSqlTableModel(this, db);
+  model = new QSqlTableModel(this, db);
   model->setTable("zyel");
   model->select();
-  model->removeColumn(model->fieldIndex("id"));
   model->setEditStrategy(QSqlTableModel::OnManualSubmit);
   ui->runewordsTableView->setModel(model);
   ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("level"));
-  ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("character"));
-  ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("number"));
-
+  ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("runes"));
+  //ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("number"));
+  ui->runewordsTableView->hideColumn(model->fieldIndex("id"));
   ui->runewordsTableView->hideColumn(model->fieldIndex("name"));
   ui->runewordsTableView->hideColumn(model->fieldIndex("warning"));
-
-  ui->runesWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
+  ui->runewordsTableView->hideColumn(model->fieldIndex("character"));
+  ui->runewordsTableView->hideColumn(model->fieldIndex("number"));
+  ui->runewordsTableView->verticalHeader()->setVisible(false);
+  ui->runewordsTableView->horizontalHeader()->setVisible(false);
+  //ui->runewordsTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   //QItemSelectionModel selection(model, this);
   //ui->runewordsTableView->setSelectionModel(&selection);
+  ui->splitter->setChildrenCollapsible(false);
+}
+
+void Widget::mySlot(){
+  QString str;
+  bool first = true;
+  if (ui->levelBox->value()){
+      str = "level <= " + QString::number(ui->levelBox->value());
+      first = false;
+  }
+  if(ui->soketBox->currentIndex()){
+      if (!first) str += " and ";
+      str += "number <= " + QString::number(ui->soketBox->currentIndex() + 1);
+      first = false;
+    }
+   QDEBUG(str);
+
+  model->setSort(model->fieldIndex("level"),ui->sortBox->isChecked() ? Qt::DescendingOrder : Qt::AscendingOrder);
+  model->setFilter(str);
 }
 
 Widget::~Widget()
