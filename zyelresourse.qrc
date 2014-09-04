@@ -1,0 +1,37 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/Amn.gif</file>
+        <file>images/Ber.gif</file>
+        <file>images/Cham.gif</file>
+        <file>images/Dol.gif</file>
+        <file>images/El.gif</file>
+        <file>images/Eld.gif</file>
+        <file>images/Eth.gif</file>
+        <file>images/Fal.gif</file>
+        <file>images/Gul.gif</file>
+        <file>images/Hel.gif</file>
+        <file>images/Io.gif</file>
+        <file>images/Ist.gif</file>
+        <file>images/Ith.gif</file>
+        <file>images/Jah.gif</file>
+        <file>images/Ko.gif</file>
+        <file>images/Lem.gif</file>
+        <file>images/Lo.gif</file>
+        <file>images/Lum.gif</file>
+        <file>images/Mal.gif</file>
+        <file>images/Nef.gif</file>
+        <file>images/Ohm.gif</file>
+        <file>images/Ort.gif</file>
+        <file>images/Pul.gif</file>
+        <file>images/Ral.gif</file>
+        <file>images/Shael.gif</file>
+        <file>images/Sol.gif</file>
+        <file>images/Sur.gif</file>
+        <file>images/Tal.gif</file>
+        <file>images/Thul.gif</file>
+        <file>images/Tir.gif</file>
+        <file>images/Um.gif</file>
+        <file>images/Vex.gif</file>
+        <file>images/Zy.gif</file>
+    </qresource>
+</RCC>
