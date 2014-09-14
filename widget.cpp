@@ -1,46 +1,46 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include <QtGui>
 
 Widget::Widget(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::Widget)
 {
   ui->setupUi(this);
-  QDir *resDir = new QDir(":/images");
-  QStringList imgList = resDir->entryList();
-  delete resDir;
-  QListWidgetItem* pitem = 0;
-  //ui->runesWidget->setIconSize(QIcon(imgList.first()).size());
-  foreach(QString str, imgList) {
-      pitem = new QListWidgetItem(str.remove(".gif"), ui->runesWidget);
-      pitem->setIcon(QIcon(":/images/" + str));
-      pitem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-  }
+//initialize db
   QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
   db.setDatabaseName("../db/zyelrune.sqlite");
   if (!db.open()) {
     qDebug() << "Cannot open database:" << db.lastError();
   }
+//generate list runes from db for runesWidget
   model = new QSqlTableModel(this, db);
+  model->setTable("runes");
+  model->select();
+  QListWidgetItem* pitem = 0;
+  for (int nRow = 0; nRow < model->rowCount(); ++nRow) {
+    QSqlRecord rec = model->record(nRow);
+    QString rune = rec.value("rune").toString();
+    pitem = new QListWidgetItem(rune, ui->runesWidget);
+    pitem->setIcon(QIcon(":/images/" + rune + ".gif"));
+    pitem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+  }
+
   model->setTable("zyel");
   model->select();
-  model->setEditStrategy(QSqlTableModel::OnManualSubmit);
   ui->runewordsTableView->setModel(model);
+  ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("items"));
   ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("level"));
   ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("runes"));
-  //ui->runewordsTableView->resizeColumnToContents(model->fieldIndex("number"));
   ui->runewordsTableView->hideColumn(model->fieldIndex("id"));
   ui->runewordsTableView->hideColumn(model->fieldIndex("name"));
   ui->runewordsTableView->hideColumn(model->fieldIndex("warning"));
   ui->runewordsTableView->hideColumn(model->fieldIndex("character"));
   ui->runewordsTableView->hideColumn(model->fieldIndex("number"));
-  ui->runewordsTableView->verticalHeader()->setVisible(false);
-  ui->runewordsTableView->horizontalHeader()->setVisible(false);
   //ui->runewordsTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-  //QItemSelectionModel selection(model, this);
-  //ui->runewordsTableView->setSelectionModel(&selection);
-  ui->splitter->setChildrenCollapsible(false);
+
+  filler();
+
+  ui->runewordsTableView->setItemDelegate(new BackgroundItemDelegate(ui->runewordsTableView));
 }
 
 void Widget::mySlot(){
@@ -52,13 +52,55 @@ void Widget::mySlot(){
   }
   if(ui->soketBox->currentIndex()){
       if (!first) str += " and ";
-      str += "number <= " + QString::number(ui->soketBox->currentIndex() + 1);
+      str += "number == " + QString::number(ui->soketBox->currentIndex() + 1);
       first = false;
-    }
-   QDEBUG(str);
+  }
+//  if(ui->itemBox->currentIndex()){ //TODO: do-doo do-doo!!!11 ;/
+//    if (!first) str += " and ";
+//    str += "(items LIKE '%ch%' or items LIKE '%cm%')";
+//    first = false;
+//  }
 
-  model->setSort(model->fieldIndex("level"),ui->sortBox->isChecked() ? Qt::DescendingOrder : Qt::AscendingOrder);
+  QDEBUG(str);
+  model->setSort(model->fieldIndex("level"), ui->sortBox->isChecked() ? Qt::DescendingOrder : Qt::AscendingOrder);
   model->setFilter(str);
+}
+
+void Widget::descriptionSlot(const QModelIndex& index){
+  if(index.isValid()){
+    QDEBUG(index.data());
+    QDEBUG(index.row());
+  }
+}
+
+void Widget::filler(){
+  QStringList charList;
+  charList << tr("Any Hero")// TODO: need rename
+           << tr("Amazon")
+           << tr("Assasin")
+           << tr("Necromancer")
+           << tr("Barbarian")
+           << tr("Paladin")
+           << tr("Sorceress")
+           << tr("Druid")
+           << tr("All Heroes");
+  ui->charBox->addItems(charList);
+}
+
+BackgroundItemDelegate::BackgroundItemDelegate(QObject* pobj = 0) : QItemDelegate(pobj){
+  charSkill << "" << "M" << "A" << "N" << "B" << "P" << "S" << "D" << "@"; //short character name in db
+}
+
+void BackgroundItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const{
+  int charBoxIndex = parent()->parent()->parent()->findChild<QComboBox *>("charBox")->currentIndex();
+  if(charBoxIndex){
+    QString character = qobject_cast<QSqlTableModel *>(qobject_cast<QTableView *>(parent())->model())->record(index.row()).value("character").toString();
+    if (character == charSkill.at(charBoxIndex)){
+      painter->setBrush(QBrush(Qt::green));
+      painter->drawRect(option.rect);
+    }
+  }
+  QItemDelegate::paint(painter, option, index);
 }
 
 Widget::~Widget()
