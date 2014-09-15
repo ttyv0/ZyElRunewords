@@ -94,7 +94,7 @@ BackgroundItemDelegate::BackgroundItemDelegate(QObject* pobj = 0) : QItemDelegat
 void BackgroundItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const{
   int charBoxIndex = parent()->parent()->parent()->findChild<QComboBox *>("charBox")->currentIndex();
   if(charBoxIndex){
-    QString character = qobject_cast<QSqlTableModel *>(qobject_cast<QTableView *>(parent())->model())->record(index.row()).value("character").toString();
+    QString character = qobject_cast<const QSqlTableModel *>(index.model())->record(index.row()).value("character").toString();
     if (character == charSkill.at(charBoxIndex)){
       painter->setBrush(QBrush(Qt::green));
       painter->drawRect(option.rect);
