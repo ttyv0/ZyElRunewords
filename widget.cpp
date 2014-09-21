@@ -21,7 +21,7 @@ Widget::Widget(QWidget *parent) :
     QSqlRecord rec = model->record(nRow);
     QString rune = rec.value("rune").toString();
     pitem = new QListWidgetItem(rune, ui->runesWidget);
-    pitem->setIcon(QIcon(":/images/" + rune + ".gif"));
+    pitem->setIcon(QIcon(":/images/" + rune + ".png"));
     pitem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
   }
 
@@ -70,6 +70,7 @@ void Widget::descriptionSlot(const QModelIndex& index){
   if(index.isValid()){
     QDEBUG(index.data());
     QDEBUG(index.row());
+    ui->textBrowser->setText("Soon!");
   }
 }
 
