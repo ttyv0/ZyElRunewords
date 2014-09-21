@@ -75,12 +75,12 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="item">
+        <widget class="QLabel" name="thingsLabel">
          <property name="text">
-          <string>I&amp;tem:</string>
+          <string>&amp;Things:</string>
          </property>
          <property name="buddy">
-          <cstring>itemBox</cstring>
+          <cstring>thingsBox</cstring>
          </property>
         </widget>
        </item>
@@ -159,7 +159,7 @@
         <widget class="QComboBox" name="charBox"/>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="itemBox"/>
+        <widget class="QComboBox" name="thingsBox"/>
        </item>
        <item row="4" column="0">
         <widget class="QCheckBox" name="sortBox">
@@ -227,7 +227,7 @@
  <tabstops>
   <tabstop>runesWidget</tabstop>
   <tabstop>levelBox</tabstop>
-  <tabstop>itemBox</tabstop>
+  <tabstop>thingsBox</tabstop>
   <tabstop>soketBox</tabstop>
   <tabstop>charBox</tabstop>
   <tabstop>findButton</tabstop>

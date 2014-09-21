@@ -86,6 +86,80 @@ void Widget::filler(){
            << tr("Druid")
            << tr("All Heroes");
   ui->charBox->addItems(charList);
+
+  Things things;
+  things.add(new Thing("ar", "armor", 0, 0),
+              new Thing("be", "belt", 1),
+              new Thing("bt", "boot", 1),
+              new Thing("gl", "glove", 1),
+              new Thing("to", "torso", 1),
+              new Thing("he", "helmet", 1),
+                new Thing("ci", "circlet", 2),
+                new Thing("pe", "druid pelt", 2),
+                new Thing("ph", "primal helmet", 2),
+              new Thing("sh", "shield", 1),
+                new Thing("au", "auiric shield", 2),
+                new Thing("hd", "necro head", 2),
+            new Thing("we", "weapon", 0, 0),
+              new Thing("me", "melee weapon", 1, 0),
+                new Thing("ax", "axe", 2),
+                  new Thing("ta", "thrown axe", 3),
+                new Thing("bl", "blunt weapon", 2, 0),
+                  new Thing("cb", "club", 3),
+                  new Thing("ha", "hammer", 3),
+                  new Thing("ma", "mace", 3),
+                  new Thing("ro", "magic rod", 3, 0),
+                    new Thing("sc", "scepter", 4),
+                    new Thing("st", "staff", 4),
+                    new Thing("wa", "wand", 4),
+                new Thing("cw", "claw", 2),
+                new Thing("kn", "knife", 2),
+                  new Thing("tk", "thrown knife", 3),
+                new Thing("or", "orb", 2),
+                new Thing("po", "polearm", 2),
+                new Thing("sp", "spear", 2),
+                  new Thing("as", "ama spear", 3),
+                new Thing("ja", "javelin", 2),
+                  new Thing("aj", "ama javelin", 3),
+                new Thing("sw", "sword", 2),
+              new Thing("th", "thrown weapon", 1, 0),
+                new Thing("ja", "javelin", 2),
+                  new Thing("aj", "ama javelin", 3),
+                new Thing("ta", "thrown axe", 2),
+                new Thing("kn", "knife", 2),
+              new Thing("mi", "missile weapon", 1, 0),
+                new Thing("bo", "bow", 2),
+                  new Thing("ab", "amazon bow", 3),
+                new Thing("xb", "crossbow", 2)),
+            new Thing("cm", "charm", 0, 0),
+              new Thing("cg", "charm grand", 1),
+              new Thing("ch", "charm hex", 1),
+              new Thing("cl", "charm large", 1),
+              new Thing("cn", "charm narrow", 1),
+              new Thing("cq", "charm quad", 1),
+              new Thing("cs", "charm small", 1),
+              new Thing("ct", "charm tall", 1);
+  things.fillComboBox(ui->thingsBox);
+}
+
+Thing::Thing(QString ch, QString name, quint8 pos, bool show) : ch(ch), name(name), pos(pos), show(show){}
+
+void Things::add(Thing *i ...){
+  va_list params;
+  va_start(params, i);
+  for (;;){
+    Thing *p = va_arg(params, Thing *);
+    if (p == 0) break;
+    listThings.push_back(p);
+  }
+  va_end(params);
+};
+
+void Things::fillComboBox(QComboBox *box){
+  box->addItem("");
+  foreach(Thing *i, listThings){
+    if (i->show) box->addItem(i->name);//FIXME: with Qt5 here a segmentation fault :(
+  }
 }
 
 BackgroundItemDelegate::BackgroundItemDelegate(QObject* pobj = 0) : QItemDelegate(pobj){

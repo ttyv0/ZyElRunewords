@@ -16,6 +16,26 @@ namespace Ui {
   class Widget;
 }
 
+class Thing
+{
+public:
+  QString ch;
+  QString name;
+  quint8 pos;
+  bool show;
+  Thing(QString, QString, quint8, bool show = true);
+  ~Thing();
+};
+
+class Things
+{
+public:
+  Things(){};
+  void fillComboBox(QComboBox *);
+  void add(Thing * ...);
+private:
+  QList<Thing *> listThings;
+};
 
 class BackgroundItemDelegate : public QItemDelegate
 {
