@@ -130,7 +130,7 @@ void Widget::filler(){
               new Thing("mi", "missile weapon", 1, 0),
                 new Thing("bo", "bow", 2),
                   new Thing("ab", "amazon bow", 3),
-                new Thing("xb", "crossbow", 2)),
+                new Thing("xb", "crossbow", 2),
             new Thing("cm", "charm", 0, 0),
               new Thing("cg", "charm grand", 1),
               new Thing("ch", "charm hex", 1),
@@ -138,7 +138,8 @@ void Widget::filler(){
               new Thing("cn", "charm narrow", 1),
               new Thing("cq", "charm quad", 1),
               new Thing("cs", "charm small", 1),
-              new Thing("ct", "charm tall", 1);
+              new Thing("ct", "charm tall", 1),
+            NULL);
   things.fillComboBox(ui->thingsBox);
 }
 
@@ -147,22 +148,20 @@ Thing::Thing(QString ch, QString name, quint8 pos, bool show) : ch(ch), name(nam
 void Things::add(Thing *i ...){
   va_list params;
   va_start(params, i);
-  for (;;){
-    Thing *p = va_arg(params, Thing *);
-    if (p == 0) break;
+  for (Thing *p = i; p != NULL; p = va_arg(params, Thing *)){
     listThings.push_back(p);
   }
   va_end(params);
-};
+}
 
 void Things::fillComboBox(QComboBox *box){
   box->addItem("");
   foreach(Thing *i, listThings){
-    if (i->show) box->addItem(i->name);//FIXME: with Qt5 here a segmentation fault :(
+    if (i->show) box->addItem(i->name);
   }
 }
 
-BackgroundItemDelegate::BackgroundItemDelegate(QObject* pobj = 0) : QItemDelegate(pobj){
+BackgroundItemDelegate::BackgroundItemDelegate(QObject* pobj) : QItemDelegate(pobj){
   charSkill << "" << "M" << "A" << "N" << "B" << "P" << "S" << "D" << "@"; //short character name in db
 }
 
