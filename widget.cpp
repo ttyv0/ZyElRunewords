@@ -38,56 +38,6 @@ Widget::Widget(QWidget *parent) :
   ui->runewordsTableView->hideColumn(model->fieldIndex("number"));
   //ui->runewordsTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
-  filler();
-
-  ui->runewordsTableView->setItemDelegate(new BackgroundItemDelegate(ui->runewordsTableView));
-}
-
-void Widget::mySlot(){
-  QString str;
-  bool first = true;
-  if (ui->levelBox->value()){
-      str = "level <= " + QString::number(ui->levelBox->value());
-      first = false;
-  }
-  if(ui->soketBox->currentIndex()){
-      if (!first) str += " and ";
-      str += "number == " + QString::number(ui->soketBox->currentIndex() + 1);
-      first = false;
-  }
-//  if(ui->itemBox->currentIndex()){ //TODO: do-doo do-doo!!!11 ;/
-//    if (!first) str += " and ";
-//    str += "(items LIKE '%ch%' or items LIKE '%cm%')";
-//    first = false;
-//  }
-
-  QDEBUG(str);
-  model->setSort(model->fieldIndex("level"), ui->sortBox->isChecked() ? Qt::DescendingOrder : Qt::AscendingOrder);
-  model->setFilter(str);
-}
-
-void Widget::descriptionSlot(const QModelIndex& index){
-  if(index.isValid()){
-    QDEBUG(index.data());
-    QDEBUG(index.row());
-    ui->textBrowser->setText("Soon!");
-  }
-}
-
-void Widget::filler(){
-  QStringList charList;
-  charList << tr("Any Hero")// TODO: need rename
-           << tr("Amazon")
-           << tr("Assasin")
-           << tr("Necromancer")
-           << tr("Barbarian")
-           << tr("Paladin")
-           << tr("Sorceress")
-           << tr("Druid")
-           << tr("All Heroes");
-  ui->charBox->addItems(charList);
-
-  Things things;
   things.add(new Thing("ar", "armor", 0, 0),
               new Thing("be", "belt", 1),
               new Thing("bt", "boot", 1),
@@ -141,6 +91,55 @@ void Widget::filler(){
               new Thing("ct", "charm tall", 1),
             NULL);
   things.fillComboBox(ui->thingsBox);
+  QStringList charList;
+  charList << tr("Any Hero")// TODO: need rename
+           << tr("Amazon")
+           << tr("Assasin")
+           << tr("Necromancer")
+           << tr("Barbarian")
+           << tr("Paladin")
+           << tr("Sorceress")
+           << tr("Druid")
+           << tr("All Heroes");
+  ui->charBox->addItems(charList);
+
+  ui->runewordsTableView->setItemDelegate(new BackgroundItemDelegate(ui->runewordsTableView));
+}
+
+void Widget::mySlot(){
+  QString str;
+  bool first = true;
+  if (ui->levelBox->value()){
+      str = "level <= " + QString::number(ui->levelBox->value());
+      first = false;
+  }
+  if(ui->soketBox->currentIndex()){
+      if (!first) str += " and ";
+      str += "number == " + QString::number(ui->soketBox->currentIndex() + 1);
+      first = false;
+  }
+  if(ui->thingsBox->currentIndex()){
+    if (!first) str += " and";
+    str += " (";
+    for (int i = things.itr(ui->thingsBox->currentText()); i != 0; i--){
+      str += "items LIKE '%" + things.find(ui->thingsBox->currentText(), i) + "%'";
+      if (i > 1) str += " or ";
+      first = false;
+    }
+    str += ") ";
+  }
+
+  QDEBUG(str);
+  model->setSort(model->fieldIndex("level"), ui->sortBox->isChecked() ? Qt::DescendingOrder : Qt::AscendingOrder);
+  model->setFilter(str);
+}
+
+void Widget::descriptionSlot(const QModelIndex& index){
+  if(index.isValid()){
+    QDEBUG(index.data());
+    QDEBUG(index.row());
+    ui->textBrowser->setText("Soon!");
+  }
 }
 
 Thing::Thing(QString ch, QString name, quint8 pos, bool show) : ch(ch), name(name), pos(pos), show(show){}
@@ -159,6 +158,28 @@ void Things::fillComboBox(QComboBox *box){
   foreach(Thing *i, listThings){
     if (i->show) box->addItem(i->name);
   }
+}
+
+int Things::itr(QString str){
+  QList<Thing *>::const_iterator it = listThings.constBegin();
+  for (; it != listThings.constEnd(); ++it)
+    if ((*it)->name == str) return (*it)->pos;
+  return 0;
+}
+
+QString Things::find(QString str, int i){
+  QList<Thing *>::iterator it= listThings.begin();
+  bool down = true;
+  while(it != listThings.end()){
+    if (down){
+      ++it;
+      if ((*it)->name == str) down = false;
+    } else {
+      if (i == (*it)->pos) break;
+      --it;
+    }
+  }
+  return (*it)->ch;
 }
 
 BackgroundItemDelegate::BackgroundItemDelegate(QObject* pobj) : QItemDelegate(pobj){

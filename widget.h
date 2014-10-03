@@ -30,8 +30,10 @@ public:
 class Things
 {
 public:
-  Things(){};
+  Things(){}
   void fillComboBox(QComboBox *);
+  int itr(QString);
+  QString find(QString, int);
   void add(Thing * ...);
 private:
   QList<Thing *> listThings;
@@ -60,9 +62,9 @@ public slots:
   void descriptionSlot(const QModelIndex&);
 
 private:
-  void filler();
   Ui::Widget *ui;
   QSqlTableModel *model;
+  Things things;
 };
 
 #endif // WIDGET_H
